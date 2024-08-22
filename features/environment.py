@@ -1,5 +1,5 @@
 def before_all(context):
-    # Any setup before tests run
+
     pass
 
 def after_all(context):

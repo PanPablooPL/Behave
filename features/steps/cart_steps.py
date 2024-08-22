@@ -8,14 +8,13 @@ import time
 
 @given('I am on the homepage')
 def step_given_i_am_on_the_homepage(context):
-    context.browser = webdriver.Chrome()  # Możesz również użyć innego WebDriver
+    context.browser = webdriver.Chrome()
     context.browser.get("https://bstackdemo.com/")
 
 @when('I sign in')
 def step_when_i_sign_in(context):
     context.browser.find_element(By.LINK_TEXT, "Sign In").click()
 
-    # Czekaj, aż pole na nazwę użytkownika będzie klikalne i wprowadź dane
     WebDriverWait(context.browser, 10).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, '#username .css-1hwfws3'))
     ).click()
@@ -32,24 +31,19 @@ def step_when_i_sign_in(context):
 
 @when('I add the first product to the cart')
 def step_when_i_add_the_first_product_to_the_cart(context):
-    # Czekaj, aż produkty będą widoczne
     WebDriverWait(context.browser, 10).until(
         EC.visibility_of_element_located((By.CSS_SELECTOR, '.shelf-item'))
     )
 
-    # Wybierz pierwszy przycisk "Add to cart" na stronie
     try:
-        # Znajdź wszystkie przyciski "Add to cart"
         add_to_cart_buttons = WebDriverWait(context.browser, 10).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.shelf-item__buy-btn'))
         )
-        # Kliknij pierwszy przycisk "Add to cart"
         if add_to_cart_buttons:
             add_to_cart_buttons[0].click()
         else:
             raise Exception("No 'Add to cart' button found.")
 
-        # Dodaj 5-sekundową przerwę, aby móc zobaczyć zmiany
         time.sleep(5)
 
     except TimeoutException:
@@ -59,7 +53,6 @@ def step_when_i_add_the_first_product_to_the_cart(context):
 @then('I take a screenshot of the cart item')
 def step_then_i_take_a_screenshot_of_the_cart_item(context):
     try:
-        # Kliknij na koszyk, aby zobaczyć jego zawartość
         try:
             cart_button = WebDriverWait(context.browser, 10).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, '.float-cart__header'))
@@ -69,17 +62,14 @@ def step_then_i_take_a_screenshot_of_the_cart_item(context):
             print("Cart button not found within the timeout period")
             raise
 
-        # Czekaj, aż element koszyka będzie widoczny
         WebDriverWait(context.browser, 30).until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, '.float-cart__content'))
         )
 
-        # Wybierz element koszyka
         cart_item_element = WebDriverWait(context.browser, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, '.float-cart__content .shelf-item'))
         )
 
-        # Możemy teraz zrobić zrzut ekranu wybranego elementu
         screenshot_path = "cart_item_screenshot.png"
         cart_item_element.screenshot(screenshot_path)
         print(f"Screenshot of the cart item saved as '{screenshot_path}'")
